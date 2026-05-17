@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Smart Home Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-microchip"></i>
+                <span>ESP32 Panel</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active"><a href="#"><i class="fas fa-home"></i> Tổng quan</a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> Biểu đồ</a></li>
+                <li><a href="#"><i class="fas fa-bolt"></i> Năng lượng</a></li>
+                <li><a href="#"><i class="fas fa-shield-alt"></i> Cảnh báo</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <div class="header-info">
+                    <h1>Hệ Thống Giám Sát Gia Đình</h1>
+                    <p>Đồ án Hệ Thống Nhúng - Nhóm 5</p>
+                </div>
+                <div class="header-status">
+                    <div class="status-indicator">
+                        <span class="pulse-dot"></span>
+                        <span id="system-status">Hệ thống đang chạy</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="top-cards">
+                <!-- Presence Radar LD2410 -->
+                <div class="status-card presence-card" id="radar-card">
+                    <div class="card-icon"><i class="fas fa-walking"></i></div>
+                    <div class="card-content">
+                        <h3>Cảm biến Radar (LD2410)</h3>
+                        <div class="status-text" id="presence-status">Không có người</div>
+                    </div>
+                </div>
+
+                <!-- Alerts -->
+                <div class="status-card alert-card safe" id="alert-card">
+                    <div class="card-icon"><i class="fas fa-bell"></i></div>
+                    <div class="card-content">
+                        <h3>Trạng thái an toàn</h3>
+                        <div class="status-text" id="alert-status">Bình thường</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sensors Grid -->
+            <div class="sensors-grid">
+                <!-- Nhiệt độ -->
+                <div class="sensor-card">
+                    <div class="sensor-header">
+                        <i class="fas fa-temperature-half temp-icon"></i>
+                        <span>Nhiệt độ (DHT22)</span>
+                    </div>
+                    <div class="sensor-value">
+                        <span id="val-temp">--</span>
+                        <span class="unit">°C</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="fill temp-fill" id="bar-temp"></div>
+                    </div>
+                </div>
+
+                <!-- Độ ẩm -->
+                <div class="sensor-card">
+                    <div class="sensor-header">
+                        <i class="fas fa-droplet humid-icon"></i>
+                        <span>Độ ẩm (DHT22)</span>
+                    </div>
+                    <div class="sensor-value">
+                        <span id="val-humid">--</span>
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="fill humid-fill" id="bar-humid"></div>
+                    </div>
+                </div>
+
+                <!-- Dòng điện Đèn -->
+                <div class="sensor-card">
+                    <div class="sensor-header">
+                        <i class="fas fa-lightbulb light-icon"></i>
+                        <span>Dòng điện Đèn (ACS)</span>
+                    </div>
+                    <div class="sensor-value">
+                        <span id="val-current-l">--</span>
+                        <span class="unit">A</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="fill light-fill" id="bar-current-l"></div>
+                    </div>
+                </div>
+
+                <!-- Dòng điện Quạt -->
+                <div class="sensor-card">
+                    <div class="sensor-header">
+                        <i class="fas fa-fan power-icon"></i>
+                        <span>Dòng điện Quạt (ACS)</span>
+                    </div>
+                    <div class="sensor-value">
+                        <span id="val-current-f">--</span>
+                        <span class="unit">A</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="fill power-fill" id="bar-current-f"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control & Chart Section -->
+            <div class="bottom-section">
+                <!-- Device Controls -->
+                <div class="controls-panel">
+                    <h2>Thiết bị chấp hành (Relay)</h2>
+
+                    <div class="device-list">
+                        <!-- Quạt -->
+                        <div class="device-item">
+                            <div class="device-info">
+                                <i class="fas fa-fan"></i>
+                                <div>
+                                    <h4>Quạt điện</h4>
+                                    <p>Tự động bật khi có người và nóng</p>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="fan-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <!-- Đèn -->
+                        <div class="device-item">
+                            <div class="device-info">
+                                <i class="fas fa-lightbulb"></i>
+                                <div>
+                                    <h4>Đèn chiếu sáng</h4>
+                                    <p>Tự động bật khi thiếu sáng và có người</p>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="light-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="voice-cmd-box">
+                        <i class="fas fa-microphone"></i>
+                        <span>Nhận lệnh giọng nói qua INMP441</span>
+                        <div class="voice-wave">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Chart -->
+                <div class="chart-panel">
+                    <h2>Biểu đồ lịch sử giám sát</h2>
+                    <div class="chart-container">
+                        <canvas id="envChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
